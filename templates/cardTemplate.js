@@ -38,8 +38,8 @@ function createPDF(credentials) {
   const pageWidth = doc.page.width - (margin.left + margin.right);
   const pageHeight = doc.page.height - (margin.top + margin.bottom);
   
-  const columnGap = 8;
-  const rowGap = 4;
+  const columnGap = 12; // เพิ่มระยะห่างระหว่างคอลัมน์
+  const rowGap = 8; // เพิ่มระยะห่างระหว่างแถว
   
   const cardWidth = (pageWidth - columnGap) / 2;
   const cardHeight = (pageHeight - (rowGap * 9)) / 10;
@@ -93,30 +93,16 @@ function createPDF(credentials) {
   const leftCredentials = credentials.slice(0, 10);
   const rightCredentials = credentials.slice(10, 20);
   
-  // วาดเส้นแบ่งแนวตั้งระหว่าง 2 คอลัมน์
-  const verticalLineX = margin.left + cardWidth;
-  doc.moveTo(verticalLineX, margin.top)
-     .lineTo(verticalLineX, margin.top + (cardHeight * 10) + (rowGap * 9))
-     .strokeColor('#000000')
-     .lineWidth(lineWidth)
-     .stroke();
+  // ไม่วาดเส้นแบ่งแนวตั้งระหว่างคอลัมน์ เพื่อให้แต่ละ card แยกกันชัดเจน
   
   // สร้าง cards สำหรับคอลัมน์ซ้าย
   leftCredentials.forEach((cred, index) => {
     const x = margin.left; // left margin
     const y = margin.top + (index * (cardHeight + rowGap));
     
-    // วาดเส้นแบ่งแนวนอนระหว่างแถว (ยกเว้นแถวแรก)
-    if (index > 0) {
-      const lineY = y;
-      doc.moveTo(x, lineY)
-         .lineTo(x + cardWidth, lineY)
-         .strokeColor('#000000')
-         .lineWidth(lineWidth)
-         .stroke();
-    }
+    // ไม่วาดเส้นแบ่งแนวนอน เพื่อให้แต่ละ card แยกกันชัดเจน
     
-    // วาดกรอบสี่เหลี่ยมให้ card
+    // วาดกรอบสี่เหลี่ยมให้ card (แต่ละ card แยกกัน)
     doc.rect(x, y, cardWidth, cardHeight)
        .strokeColor('#000000')
        .lineWidth(lineWidth)
@@ -195,17 +181,9 @@ function createPDF(credentials) {
     const x = margin.left + cardWidth + columnGap; // left margin + card width + gap
     const y = margin.top + (index * (cardHeight + rowGap));
     
-    // วาดเส้นแบ่งแนวนอนระหว่างแถว (ยกเว้นแถวแรก)
-    if (index > 0) {
-      const lineY = y;
-      doc.moveTo(x, lineY)
-         .lineTo(x + cardWidth, lineY)
-         .strokeColor('#000000')
-         .lineWidth(lineWidth)
-         .stroke();
-    }
+    // ไม่วาดเส้นแบ่งแนวนอน เพื่อให้แต่ละ card แยกกันชัดเจน
     
-    // วาดกรอบสี่เหลี่ยมให้ card
+    // วาดกรอบสี่เหลี่ยมให้ card (แต่ละ card แยกกัน)
     doc.rect(x, y, cardWidth, cardHeight)
        .strokeColor('#000000')
        .lineWidth(lineWidth)
