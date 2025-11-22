@@ -1,0 +1,19 @@
+node_modules/
+output/
+CSV/
+Wi-Fi tricket/
+data/history.json
+*.log
+.DS_Store
+.env
+
+# Test files
+test-*.ps1
+test-*.js
+test-*.html
+test-*.pdf
+
+# Temporary files
+latest-print.html
+test-print-preview.html
+

@@ -1,0 +1,25 @@
+# ตัวอย่าง docker-compose.yml สำหรับ n8n
+# เพิ่ม extra_hosts เพื่อให้ host.docker.internal ทำงาน
+
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # หรือใช้ IP address โดยตรง:
+    # extra_hosts:
+    #   - "host.docker.internal:172.21.65.222"
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
+
