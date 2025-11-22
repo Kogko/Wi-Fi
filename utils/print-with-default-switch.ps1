@@ -27,43 +27,31 @@ try {
         }
     }
 
-    # 3. Print the file using Chrome or Edge (Headless)
-    Write-Host "Printing file via Browser..."
+    # 3. Print the file using silent printing script
+    Write-Host "Printing file using silent printing method..."
     
-    $browserPath = ""
-    $browserName = ""
+    # Get the directory of this script
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $silentPrintScript = Join-Path $scriptDir "print-silent.ps1"
     
-    $possiblePaths = @(
-        # Chrome (User preferred)
-        "C:\Program Files\Google\Chrome\Application\chrome.exe",
-        "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-        # Edge (Fallback)
-        "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-        "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
-    )
-    
-    foreach ($path in $possiblePaths) {
-        if (Test-Path $path) {
-            $browserPath = $path
-            if ($path -like "*chrome.exe") { $browserName = "Chrome" } else { $browserName = "Edge" }
-            break
+    if (Test-Path $silentPrintScript) {
+        # Use the silent printing script
+        $printerArg = if ([string]::IsNullOrEmpty($PrinterName)) { "" } else { "-PrinterName `"$PrinterName`"" }
+        $command = "& `"$silentPrintScript`" -FilePath `"$FilePath`" $printerArg"
+        
+        Write-Host "Executing silent print script..."
+        Invoke-Expression $command
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Print command sent successfully via silent printing."
+        } else {
+            Write-Error "Silent printing failed with exit code: $LASTEXITCODE"
+            exit 1
         }
-    }
-    
-    if ([string]::IsNullOrEmpty($browserPath)) {
-        Write-Error "No suitable browser (Chrome or Edge) found for printing."
+    } else {
+        Write-Error "Silent printing script not found: $silentPrintScript"
         exit 1
     }
-    
-    Write-Host "Using $browserName at: $browserPath"
-
-    # วิธีที่ถูกต้อง: ใช้ Start-Process -Verb Print แทน browser headless
-    # เพราะ browser headless ไม่รองรับ --print-to-printer สำหรับ PDF
-    Write-Host "Using Start-Process -Verb Print method..."
-    
-    Start-Process -FilePath $FilePath -Verb Print -PassThru
-    
-    Write-Host "Print command sent successfully."
 
 }
 catch {

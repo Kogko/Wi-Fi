@@ -43,39 +43,29 @@ function printPDF(filePath, printerName = null) {
                 resolve();
             });
         } else {
-            // Fallback: SumatraPDF not found -> Use Start-Process -Verb Print
-            console.log(`SumatraPDF not found. Using Windows default print method...`);
+            // Fallback: SumatraPDF not found -> Use silent printing script
+            console.log(`SumatraPDF not found. Using silent printing script...`);
             if (printerName) {
                 console.log(`Target printer: ${printerName}`);
-                // ถ้ามี printer name ต้องใช้ PowerShell script เพื่อเปลี่ยน default printer
-                const psScript = path.join(__dirname, 'print-with-default-switch.ps1');
-                const safePrinterName = printerName || "";
-                const command = `powershell -ExecutionPolicy Bypass -File "${psScript}" -FilePath "${filePath}" -PrinterName "${safePrinterName}"`;
-
-                exec(command, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`Print error: ${error.message}`);
-                        return reject(error);
-                    }
-                    if (stdout) console.log(`PowerShell Output: ${stdout}`);
-                    console.log('Print command executed successfully via PowerShell');
-                    resolve();
-                });
             } else {
-                // ถ้าไม่มี printer name ใช้ Start-Process -Verb Print โดยตรง
-                const command = `powershell -Command "Start-Process -FilePath '${filePath}' -Verb Print"`;
-                console.log(`Executing: ${command}`);
-                
-                exec(command, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`Print error: ${error.message}`);
-                        return reject(error);
-                    }
-                    if (stdout) console.log(`PowerShell Output: ${stdout}`);
-                    console.log('Print command executed successfully via Start-Process');
-                    resolve();
-                });
+                console.log(`Using default printer`);
             }
+            
+            // Use silent printing script
+            const psScript = path.join(__dirname, 'print-silent.ps1');
+            const safePrinterName = printerName || "";
+            const command = `powershell -ExecutionPolicy Bypass -File "${psScript}" -FilePath "${filePath}" -PrinterName "${safePrinterName}"`;
+
+            exec(command, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Print error: ${error.message}`);
+                    return reject(error);
+                }
+                if (stdout) console.log(`PowerShell Output: ${stdout}`);
+                if (stderr) console.warn(`PowerShell Warning: ${stderr}`);
+                console.log('Print command executed successfully via silent printing script');
+                resolve();
+            });
         }
     });
 }
